@@ -1,1 +1,7 @@
-# Notes_BME2B
+# Course Notes
+Unannotated version of course notes.
+
+### 2B
+- Statistics
+- Signals & Systems
+- Circuits
