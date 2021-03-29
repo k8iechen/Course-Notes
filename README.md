@@ -5,3 +5,6 @@ Unannotated version of course notes.
 - Statistics
 - Signals & Systems
 - Circuits
+
+### 3A
+- 355 Assignment
