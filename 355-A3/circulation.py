@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.integrate import solve_ivp
-
+import matplotlib.pyplot as plt
 
 class Circulation:
     """
@@ -53,14 +53,16 @@ class Circulation:
         because blood inertance will keep the blood moving briefly up the pressure gradient at the end of systole. 
         If the ejection phase ends in this time, the flow will remain non-zero until the next ejection phase. 
         """
-        if x[2] > x[1]:
+        if x[1] > x[0]:
             #filling
-            A_1 = filling_phase_dynamic_matrix(self, t)
-        elif x[4] > 0 or x[1] > x[3]:
+            A_1 = self.filling_phase_dynamic_matrix(t)
+        elif x[3] > 0 or x[0] > x[2]:
             #ejection
-            A_1 = ejection_phase_dynamic_matrix(self, t)
+            A_1 = self.ejection_phase_dynamic_matrix(t)
         else:
-            A_1 = isovolumic_phase_dynamic_matrix(self, t)
+            #isovolumic
+            A_1 = self.isovolumic_phase_dynamic_matrix(t)
+
         return np.matmul(A_1, x)
 
     def isovolumic_phase_dynamic_matrix(self, t):
@@ -138,6 +140,12 @@ class Circulation:
         WRITE CODE HERE
         Put all the blood pressure in the atria as an initial condition.
         """
+        sol = solve_ivp(self.get_derivative, [0,total_time], [0, self.non_slack_blood_volume, 0, 0], rtol=1e-5, atol=1e-8)
+        print(sol)
+
+
+        return sol.t, sol.y
+
 
     def _get_normalized_time(self, t):
         """
@@ -146,3 +154,24 @@ class Circulation:
         """
         return (t % self.tc) / self.Tmax
 
+#main
+HR = 75
+Emax = 2
+Emin = 0.06
+
+model = Circulation(HR, Emax, Emin)
+t, state = model.simulate(5)
+
+def plot(t, state):
+    plt.plot(t, state[0], label="Left Ventricular Pressure (mmHg)")
+    plt.plot(t, state[1], label="Left Atrial Pressure (mmHg)")
+    plt.plot(t, state[2], label="Arterial Pressure (mmHg)")
+    plt.plot(t, state[3], label="Aortic flow (ml/sec)")
+    plt.legend()
+
+    plt.xlabel('Time (s)')
+    plt.ylabel('State')
+
+    plt.show()
+
+plot(t, state)
