@@ -39,7 +39,7 @@ class Circulation:
         """
         :param t: time
         :param x: state variables [ventricular pressure; atrial pressure; arterial pressure; aortic flow]
-        :return: time derivatives of state variables
+        :return: time derivatives of state variables = A_1(t)x
         """
 
         """
@@ -53,6 +53,8 @@ class Circulation:
         because blood inertance will keep the blood moving briefly up the pressure gradient at the end of systole. 
         If the ejection phase ends in this time, the flow will remain non-zero until the next ejection phase. 
         """
+        
+        return np.matmul(A_1, x)
 
     def isovolumic_phase_dynamic_matrix(self, t):
         """
@@ -87,6 +89,13 @@ class Circulation:
         """
         WRITE CODE HERE
         """
+        el = self.elastance(t)
+        del_dt = self.elastance_finite_difference(t)
+
+        return [[del_dt/el - el/self.R2, el/self.R2, 0, 0],
+                [1/(self.R2*self.C2), -(self.R1+self.R2)/(self.C2*self.R1*self.R2), 1/(self.R1*self.C2), 0],
+                [0, 1/(self.R1*self.C3), -1/(self.R1*self.C3), 0],
+                [0, 0, 0, 0]]
 
     def elastance(self, t):
         """
