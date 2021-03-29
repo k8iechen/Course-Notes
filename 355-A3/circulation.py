@@ -53,7 +53,14 @@ class Circulation:
         because blood inertance will keep the blood moving briefly up the pressure gradient at the end of systole. 
         If the ejection phase ends in this time, the flow will remain non-zero until the next ejection phase. 
         """
-        
+        if x[2] > x[1]:
+            #filling
+            A_1 = filling_phase_dynamic_matrix(self, t)
+        elif x[4] > 0 or x[1] > x[3]:
+            #ejection
+            A_1 = ejection_phase_dynamic_matrix(self, t)
+        else:
+            A_1 = isovolumic_phase_dynamic_matrix(self, t)
         return np.matmul(A_1, x)
 
     def isovolumic_phase_dynamic_matrix(self, t):
