@@ -140,7 +140,7 @@ class Circulation:
         WRITE CODE HERE
         Put all the blood pressure in the atria as an initial condition.
         """
-        sol = solve_ivp(self.get_derivative, [0,total_time], [0, self.non_slack_blood_volume, 0, 0], rtol=1e-5, atol=1e-8)
+        sol = solve_ivp(self.get_derivative, [0,total_time], [0, self.non_slack_blood_volume/self.C2, 0, 0], rtol=1e-5, atol=1e-8)
         print(sol)
 
 
@@ -154,14 +154,6 @@ class Circulation:
         """
         return (t % self.tc) / self.Tmax
 
-#main
-HR = 75
-Emax = 2
-Emin = 0.06
-
-model = Circulation(HR, Emax, Emin)
-t, state = model.simulate(5)
-
 def plot(t, state):
     plt.plot(t, state[0], label="Left Ventricular Pressure (mmHg)")
     plt.plot(t, state[1], label="Left Atrial Pressure (mmHg)")
@@ -174,4 +166,12 @@ def plot(t, state):
 
     plt.show()
 
+#main
+HR = 75
+Emax = 2
+Emin = 0.06
+
+model = Circulation(HR, Emax, Emin)
+t, state = model.simulate(5)
+#A3Q2
 plot(t, state)
