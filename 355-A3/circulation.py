@@ -41,18 +41,6 @@ class Circulation:
         :param x: state variables [ventricular pressure; atrial pressure; arterial pressure; aortic flow]
         :return: time derivatives of state variables = A_1(t)x
         """
-
-        """
-        WRITE CODE HERE
-        Implement this by deciding whether the model is in a filling, ejecting, or isovolumic phase and using 
-        the corresponding dynamic matrix. 
-         
-        As discussed in class, be careful about starting and ending the ejection phase. One approach is to check 
-        whether the flow is >0, and another is to check whether x1>x3, but neither will work. The first won't start 
-        propertly because flow isn't actually updated outside the ejection phase. The second won't end properly 
-        because blood inertance will keep the blood moving briefly up the pressure gradient at the end of systole. 
-        If the ejection phase ends in this time, the flow will remain non-zero until the next ejection phase. 
-        """
         if x[1] > x[0]:
             #filling
             A_1 = self.filling_phase_dynamic_matrix(t)
@@ -94,10 +82,6 @@ class Circulation:
         :param t: time (s)
         :return: A matrix for filling phase
         """
-
-        """
-        WRITE CODE HERE
-        """
         el = self.elastance(t)
         del_dt = self.elastance_finite_difference(t)
 
@@ -135,14 +119,8 @@ class Circulation:
         :param total_time: seconds to simulate
         :return: time, state (times at which the state is estimated, state vector at each time)
         """
-
-        """
-        WRITE CODE HERE
-        Put all the blood pressure in the atria as an initial condition.
-        """
-        sol = solve_ivp(self.get_derivative, [0,total_time], [0, self.non_slack_blood_volume/self.C2, 0, 0], rtol=1e-5, atol=1e-8)
-        print(sol)
-
+        sol = solve_ivp(self.get_derivative, [0,total_time], [0, self.non_slack_blood_volume/self.C2, 0, 0], rtol=1e-10, atol=1e-10)
+        # print(sol)
 
         return sol.t, sol.y
 
@@ -174,4 +152,4 @@ Emin = 0.06
 model = Circulation(HR, Emax, Emin)
 t, state = model.simulate(5)
 #A3Q2
-plot(t, state)
+# plot(t, state)
